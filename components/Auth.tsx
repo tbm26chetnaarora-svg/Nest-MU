@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { supabase } from '../supabaseClient';
-import { Loader2, Map } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../supabaseClient';
+import { Loader2, Map, ArrowRight } from 'lucide-react';
 
 export const Auth: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -11,8 +11,17 @@ export const Auth: React.FC = () => {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setMessage(null);
+
+    if (!isSupabaseConfigured) {
+      setMessage({ 
+        type: 'error', 
+        text: 'App is in demo mode. Connect Supabase to enable login.' 
+      });
+      return;
+    }
+
+    setLoading(true);
 
     try {
       if (mode === 'signup') {
@@ -37,47 +46,54 @@ export const Auth: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-nest-50 flex flex-col items-center justify-center p-4">
-      <div className="mb-8 text-center">
-        <div className="h-16 w-16 bg-nest-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-nest-200 mx-auto mb-4">
-          <Map size={32} />
+    <div className="min-h-screen bg-nest-950 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Decorative Elements */}
+      <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary-500/10 rounded-full blur-[100px]"></div>
+      <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-accent-500/10 rounded-full blur-[100px]"></div>
+
+      <div className="w-full max-w-md relative z-10">
+        <div className="mb-8 text-center">
+          <div className="h-20 w-20 bg-gradient-to-br from-primary-400 to-accent-500 rounded-3xl flex items-center justify-center text-white shadow-2xl shadow-primary-900/50 mx-auto mb-6 transform rotate-3 hover:rotate-6 transition-transform duration-500">
+            <Map size={40} />
+          </div>
+          <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">NEST</h1>
+          <p className="text-nest-400 font-medium tracking-wide uppercase text-sm">The Premium Family Travel OS</p>
         </div>
-        <h1 className="text-3xl font-bold text-nest-900">NEST</h1>
-        <p className="text-nest-600">The Family Travel OS</p>
-      </div>
 
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-        <div className="p-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-6">
-            {mode === 'login' ? 'Welcome back' : 'Create an account'}
+        <div className="glass-panel rounded-3xl p-8 md:p-10 shadow-2xl border border-nest-700/50 backdrop-blur-xl">
+          <h2 className="text-2xl font-bold text-white mb-2">
+            {mode === 'login' ? 'Welcome back' : 'Create account'}
           </h2>
+          <p className="text-nest-400 text-sm mb-8">
+            {mode === 'login' ? 'Enter your credentials to access your trips.' : 'Start planning your next family adventure today.'}
+          </p>
 
-          <form onSubmit={handleAuth} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <form onSubmit={handleAuth} className="space-y-5">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold uppercase text-nest-500 tracking-wider ml-1">Email</label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-nest-500 focus:border-nest-500 outline-none transition-all"
-                placeholder="you@example.com"
+                className="w-full px-5 py-3.5 rounded-xl bg-nest-900/50 border border-nest-700 text-white placeholder-nest-600 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
+                placeholder="traveler@example.com"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold uppercase text-nest-500 tracking-wider ml-1">Password</label>
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-nest-500 focus:border-nest-500 outline-none transition-all"
+                className="w-full px-5 py-3.5 rounded-xl bg-nest-900/50 border border-nest-700 text-white placeholder-nest-600 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all"
                 placeholder="••••••••"
               />
             </div>
 
             {message && (
-              <div className={`p-3 rounded-lg text-sm ${message.type === 'error' ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
+              <div className={`p-4 rounded-xl text-sm font-medium flex items-start gap-2 ${message.type === 'error' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-green-500/10 text-green-400 border border-green-500/20'}`}>
                 {message.text}
               </div>
             )}
@@ -85,29 +101,27 @@ export const Auth: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-nest-600 hover:bg-nest-700 text-white font-medium py-2.5 rounded-lg shadow-md shadow-nest-200 transition-all flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-400 hover:to-primary-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary-900/30 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 mt-4 group"
             >
-              {loading && <Loader2 size={18} className="animate-spin" />}
-              {mode === 'login' ? 'Sign In' : 'Sign Up'}
+              {loading ? <Loader2 size={20} className="animate-spin" /> : (
+                 <>
+                   {mode === 'login' ? 'Sign In' : 'Create Account'}
+                   <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                 </>
+              )}
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-500">
-            {mode === 'login' ? (
-              <>
-                Don't have an account?{' '}
-                <button onClick={() => setMode('signup')} className="text-nest-600 font-medium hover:underline">
-                  Sign up
-                </button>
-              </>
-            ) : (
-              <>
-                Already have an account?{' '}
-                <button onClick={() => setMode('login')} className="text-nest-600 font-medium hover:underline">
-                  Sign in
-                </button>
-              </>
-            )}
+          <div className="mt-8 pt-6 border-t border-nest-800 text-center">
+            <p className="text-sm text-nest-400">
+              {mode === 'login' ? "Don't have an account? " : "Already have an account? "}
+              <button 
+                onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setMessage(null); }} 
+                className="text-primary-400 font-bold hover:text-primary-300 transition-colors"
+              >
+                {mode === 'login' ? 'Sign up' : 'Sign in'}
+              </button>
+            </p>
           </div>
         </div>
       </div>

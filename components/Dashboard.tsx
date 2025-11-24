@@ -3,7 +3,7 @@ import { Session } from '@supabase/supabase-js';
 import { supabase } from '../supabaseClient';
 import { Trip } from '../types';
 import { Link } from 'react-router-dom';
-import { Calendar, MapPin, Plus, ChevronRight } from 'lucide-react';
+import { Calendar, MapPin, Plus, ArrowRight, Sparkles } from 'lucide-react';
 import { PLACEHOLDER_IMAGES } from '../constants';
 
 interface DashboardProps {
@@ -49,7 +49,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ session }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // 1. Create Trip
       const { data: tripData, error: tripError } = await supabase
         .from('trips')
         .insert([{
@@ -63,7 +62,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ session }) => {
 
       if (tripError) throw tripError;
 
-      // 2. Generate Days automatically based on range
       const start = new Date(newTrip.start_date);
       const end = new Date(newTrip.end_date);
       const daysToInsert = [];
@@ -77,7 +75,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ session }) => {
           day_number: dayCount,
           notes: ''
         });
-        // Add 1 day
         current = new Date(current.setDate(current.getDate() + 1));
         dayCount++;
       }
@@ -97,95 +94,136 @@ export const Dashboard: React.FC<DashboardProps> = ({ session }) => {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Your Trips</h1>
-          <p className="text-gray-500 mt-1">Manage your upcoming adventures.</p>
+    <div className="space-y-10 animate-fade-in">
+      {/* Hero Section */}
+      <div className="relative rounded-3xl overflow-hidden min-h-[300px] flex items-center border border-nest-800 shadow-2xl">
+        <div className="absolute inset-0 z-0">
+          <img 
+             src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2021&q=80" 
+             alt="Travel Hero" 
+             className="w-full h-full object-cover opacity-60"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-nest-950 via-nest-950/80 to-transparent"></div>
         </div>
-        <button
-          onClick={() => setIsCreating(!isCreating)}
-          className="bg-nest-600 hover:bg-nest-700 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-nest-200 flex items-center gap-2 transition-all active:scale-95"
-        >
-          <Plus size={20} />
-          {isCreating ? 'Cancel' : 'New Trip'}
-        </button>
+        
+        <div className="relative z-10 p-8 md:p-12 max-w-2xl">
+           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/20 border border-primary-500/30 text-primary-400 text-xs font-semibold uppercase tracking-wider mb-6">
+              <Sparkles size={12} /> Travel Smart
+           </div>
+           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
+              Plan smarter, calmer <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-accent-400">family trips</span> with NEST.
+           </h1>
+           <p className="text-nest-300 text-lg mb-8 max-w-lg">
+              Organize itineraries, track expenses, and coordinate details in one beautiful workspace.
+           </p>
+           <button
+             onClick={() => setIsCreating(!isCreating)}
+             className="bg-primary-500 hover:bg-primary-400 text-white px-8 py-4 rounded-xl shadow-lg shadow-primary-900/50 flex items-center gap-2 transition-all transform hover:-translate-y-1 font-semibold text-lg group"
+           >
+             <Plus size={24} className="group-hover:rotate-90 transition-transform duration-300" />
+             {isCreating ? 'Cancel Creation' : 'Create New Trip'}
+           </button>
+        </div>
       </div>
 
       {isCreating && (
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 animate-fade-in-down">
-          <form onSubmit={handleCreateTrip} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+        <div className="glass-panel p-8 rounded-2xl animate-slide-up border border-nest-700/50 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-500 to-accent-500"></div>
+          <h2 className="text-xl font-bold text-white mb-6">Start a new adventure</h2>
+          <form onSubmit={handleCreateTrip} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
             <div>
-              <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">Trip Name</label>
-              <input required type="text" placeholder="Summer Vacation" className="w-full border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-nest-500"
+              <label className="block text-xs font-bold uppercase tracking-wider text-nest-400 mb-2">Trip Name</label>
+              <input required type="text" placeholder="e.g. Italian Summer" className="w-full bg-nest-900/50 border border-nest-700 rounded-xl p-3 text-white outline-none focus:ring-2 focus:ring-primary-500 transition-all placeholder:text-nest-700"
                 value={newTrip.title} onChange={e => setNewTrip({...newTrip, title: e.target.value})} />
             </div>
             <div>
-              <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">Destination</label>
-              <input required type="text" placeholder="Paris, France" className="w-full border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-nest-500"
+              <label className="block text-xs font-bold uppercase tracking-wider text-nest-400 mb-2">Destination</label>
+              <input required type="text" placeholder="e.g. Rome, Italy" className="w-full bg-nest-900/50 border border-nest-700 rounded-xl p-3 text-white outline-none focus:ring-2 focus:ring-primary-500 transition-all placeholder:text-nest-700"
                 value={newTrip.destination} onChange={e => setNewTrip({...newTrip, destination: e.target.value})} />
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-4">
                <div>
-                  <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">Start</label>
-                  <input required type="date" className="w-full border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-nest-500"
+                  <label className="block text-xs font-bold uppercase tracking-wider text-nest-400 mb-2">Start Date</label>
+                  <input required type="date" className="w-full bg-nest-900/50 border border-nest-700 rounded-xl p-3 text-white outline-none focus:ring-2 focus:ring-primary-500 transition-all [color-scheme:dark]"
                     value={newTrip.start_date} onChange={e => setNewTrip({...newTrip, start_date: e.target.value})} />
                </div>
                <div>
-                  <label className="block text-xs font-semibold uppercase text-gray-500 mb-1">End</label>
-                  <input required type="date" className="w-full border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-nest-500"
+                  <label className="block text-xs font-bold uppercase tracking-wider text-nest-400 mb-2">End Date</label>
+                  <input required type="date" className="w-full bg-nest-900/50 border border-nest-700 rounded-xl p-3 text-white outline-none focus:ring-2 focus:ring-primary-500 transition-all [color-scheme:dark]"
                     value={newTrip.end_date} onChange={e => setNewTrip({...newTrip, end_date: e.target.value})} />
                </div>
             </div>
-            <button type="submit" disabled={loading} className="bg-gray-900 text-white font-medium p-2.5 rounded-lg hover:bg-black transition-colors">
-              {loading ? 'Creating...' : 'Create Trip'}
+            <button type="submit" disabled={loading} className="bg-white text-nest-950 hover:bg-nest-100 font-bold p-3 rounded-xl transition-colors shadow-lg shadow-white/10 h-[50px]">
+              {loading ? 'Creating...' : 'Launch Trip 🚀'}
             </button>
           </form>
         </div>
       )}
 
-      {loading && !isCreating ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-           {[1,2,3].map(i => <div key={i} className="h-64 bg-gray-200 animate-pulse rounded-2xl"></div>)}
+      <div>
+        <div className="flex items-center justify-between mb-6">
+           <h2 className="text-2xl font-bold text-white">Your Trips</h2>
+           <div className="text-nest-500 text-sm">{trips.length} upcoming</div>
         </div>
-      ) : trips.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300">
-          <MapPin className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900">No trips yet</h3>
-          <p className="text-gray-500">Create your first trip to get started!</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {trips.map((trip) => (
-            <Link to={`/trip/${trip.id}`} key={trip.id} className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100">
-              <div className="h-48 overflow-hidden relative">
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10" />
-                <img src={trip.cover_image} alt={trip.destination} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute bottom-4 left-4 z-20 text-white">
-                  <h3 className="font-bold text-xl">{trip.destination}</h3>
-                  <p className="text-sm opacity-90">{trip.title}</p>
-                </div>
-              </div>
-              <div className="p-5">
-                <div className="flex items-center text-sm text-gray-500 mb-4">
-                  <Calendar size={16} className="mr-2" />
-                  <span>{new Date(trip.start_date).toLocaleDateString()} — {new Date(trip.end_date).toLocaleDateString()}</span>
-                </div>
-                <div className="flex justify-between items-center pt-4 border-t border-gray-100">
-                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium uppercase tracking-wide
-                    ${trip.status === 'confirmed' ? 'bg-green-100 text-green-700' : 
-                      trip.status === 'completed' ? 'bg-gray-100 text-gray-700' : 'bg-amber-100 text-amber-700'}`}>
-                    {trip.status}
-                  </span>
-                  <div className="flex items-center text-nest-600 font-medium text-sm group-hover:translate-x-1 transition-transform">
-                    Plan <ChevronRight size={16} />
+
+        {loading && !isCreating ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+             {[1,2,3].map(i => <div key={i} className="h-72 bg-nest-900/50 animate-pulse rounded-3xl border border-nest-800"></div>)}
+          </div>
+        ) : trips.length === 0 ? (
+          <div className="text-center py-24 glass-card rounded-3xl border border-dashed border-nest-700">
+            <div className="bg-nest-800/50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+               <MapPin className="h-10 w-10 text-nest-500" />
+            </div>
+            <h3 className="text-xl font-medium text-white mb-2">No trips yet</h3>
+            <p className="text-nest-400 max-w-sm mx-auto">Your next adventure begins here. Create your first trip to get started!</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {trips.map((trip) => (
+              <Link to={`/trip/${trip.id}`} key={trip.id} className="group glass-card rounded-3xl overflow-hidden hover:border-primary-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary-900/20 relative flex flex-col h-[320px]">
+                <div className="h-48 overflow-hidden relative">
+                  <div className="absolute inset-0 bg-gradient-to-t from-nest-900 to-transparent z-10 opacity-90" />
+                  <img src={trip.cover_image} alt={trip.destination} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  <div className="absolute top-4 right-4 z-20">
+                     <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border shadow-lg
+                      ${trip.status === 'confirmed' ? 'bg-green-500/20 text-green-300 border-green-500/30' : 
+                        trip.status === 'completed' ? 'bg-nest-500/20 text-nest-300 border-nest-500/30' : 'bg-amber-500/20 text-amber-300 border-amber-500/30'}`}>
+                      {trip.status}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-4 left-4 z-20 text-white transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                    <h3 className="font-bold text-2xl mb-1">{trip.destination}</h3>
+                    <div className="flex items-center text-nest-300 text-xs font-medium bg-black/30 backdrop-blur-sm px-2 py-1 rounded-lg w-fit">
+                       <Calendar size={12} className="mr-2" />
+                       <span>{new Date(trip.start_date).toLocaleDateString(undefined, {month:'short', day:'numeric'})} — {new Date(trip.end_date).toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'})}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
+                
+                <div className="p-6 flex-1 flex flex-col justify-between bg-nest-900/30 backdrop-blur-sm">
+                  <div>
+                    <h4 className="text-nest-200 font-medium text-lg leading-tight line-clamp-2">{trip.title}</h4>
+                  </div>
+                  
+                  <div className="flex justify-between items-center pt-4 border-t border-white/5 mt-auto">
+                    <div className="flex -space-x-2">
+                       {/* Mock avatars */}
+                       {[1,2].map(i => (
+                          <div key={i} className="w-6 h-6 rounded-full bg-nest-700 border border-nest-900 flex items-center justify-center text-[8px] text-white">U{i}</div>
+                       ))}
+                    </div>
+                    <div className="flex items-center text-primary-400 font-semibold text-sm group-hover:translate-x-2 transition-transform">
+                      View Itinerary <ArrowRight size={16} className="ml-1" />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -15,22 +15,84 @@
             },
             colors: {
               nest: {
-                50: '#f4f7f6',
-                100: '#e3ebe8',
-                200: '#c5d9d4',
-                300: '#9dbfb7',
-                400: '#75a097',
-                500: '#56847b',
-                600: '#426861',
-                700: '#37544f',
-                800: '#2f4542',
-                900: '#283a37',
+                // Dark Theme Palette (Slate based)
+                950: '#020617', // Main Background
+                900: '#0f172a', // Cards / Sidebar
+                850: '#162032', // Card Highlight
+                800: '#1e293b', // Borders / Hovers
+                700: '#334155', // Muted
+                600: '#475569',
+                500: '#64748b',
+                400: '#94a3b8', // Secondary Text
+                300: '#cbd5e1',
+                200: '#e2e8f0',
+                100: '#f1f5f9',
+                50: '#f8fafc', // Text on dark
+              },
+              primary: {
+                400: '#38BDF8', // Sky 400 - Actions
+                500: '#0ea5e9', // Sky 500
+                600: '#0284c7', // Sky 600
+                900: '#0c4a6e', // Sky 900
+              },
+              accent: {
+                400: '#c084fc', // Purple 400
+                500: '#A855F7', // Purple 500
+                600: '#9333ea', // Purple 600
+                900: '#581c87', // Purple 900
+              }
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-out',
+              'slide-up': 'slideUp 0.5s ease-out',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              slideUp: {
+                '0%': { transform: 'translateY(20px)', opacity: '0' },
+                '100%': { transform: 'translateY(0)', opacity: '1' },
               }
             }
           }
         }
       }
     </script>
+    <style>
+      body {
+        background-color: #020617;
+        color: #f8fafc;
+      }
+      /* Custom scrollbar for dark theme */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #020617; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #334155; 
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #475569; 
+      }
+      .glass-panel {
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .glass-card {
+        background: rgba(30, 41, 59, 0.4);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      }
+    </style>
   <script type="importmap">
 {
   "imports": {
@@ -44,7 +106,7 @@
 }
 </script>
 </head>
-  <body class="bg-nest-50 text-slate-800 antialiased">
+  <body class="antialiased selection:bg-primary-500 selection:text-white">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

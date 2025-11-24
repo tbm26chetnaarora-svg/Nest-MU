@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { supabase } from './supabaseClient';
+import { supabase, isSupabaseConfigured } from './supabaseClient';
 import { Session } from '@supabase/supabase-js';
 import { Auth } from './components/Auth';
 import { Dashboard } from './components/Dashboard';
@@ -13,6 +13,12 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // If not configured, skip network requests to prevent "Failed to fetch"
+    if (!isSupabaseConfigured) {
+      setLoading(false);
+      return;
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setLoading(false);
