@@ -5,7 +5,9 @@ import { createClient } from '@supabase/supabase-js';
 
 const getEnv = (key: string) => {
   try {
-    return (import.meta as any).env?.[key];
+    // Safely access import.meta.env
+    const meta = (import.meta as any);
+    return meta && meta.env ? meta.env[key] : undefined;
   } catch {
     return undefined;
   }
@@ -14,10 +16,14 @@ const getEnv = (key: string) => {
 const envUrl = getEnv('VITE_SUPABASE_URL');
 const envKey = getEnv('VITE_SUPABASE_ANON_KEY');
 
-const supabaseUrl = envUrl || 'https://placeholder.supabase.co';
-const supabaseAnonKey = envKey || 'placeholder-key';
+const supabaseUrl = envUrl || 'https://fyxtjivbmkjwgrrghwcn.supabase.co';
+const supabaseAnonKey = envKey || 'sb_publishable_9nI863VCUQSAkS4oQ2kJQw_HMz-gwLu';
 
 // Flag to check if we have real credentials
-export const isSupabaseConfigured = !!envUrl && !!envKey;
+export const isSupabaseConfigured = supabaseUrl !== 'https://placeholder.supabase.co';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    flowType: 'pkce',
+  },
+});

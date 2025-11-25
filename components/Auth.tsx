@@ -1,13 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase, isSupabaseConfigured } from '../supabaseClient';
-import { Loader2, Map, ArrowRight } from 'lucide-react';
+import { Loader2, Map, ArrowRight, AlertTriangle, Compass } from 'lucide-react';
 
-export const Auth: React.FC = () => {
+interface AuthProps {
+  onDemoLogin: () => void;
+}
+
+export const Auth: React.FC<AuthProps> = ({ onDemoLogin }) => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [message, setMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null);
+  const [isLocalhost, setIsLocalhost] = useState(false);
+
+  useEffect(() => {
+    const hostname = window.location.hostname;
+    setIsLocalhost(hostname === 'localhost' || hostname === '127.0.0.1');
+  }, []);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +38,9 @@ export const Auth: React.FC = () => {
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo: window.location.origin,
+          }
         });
         if (error) throw error;
         setMessage({ type: 'success', text: 'Check your email for the confirmation link!' });
@@ -98,6 +111,16 @@ export const Auth: React.FC = () => {
               </div>
             )}
 
+            {mode === 'signup' && isLocalhost && !message && (
+               <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl flex gap-3 text-left">
+                  <AlertTriangle className="flex-shrink-0 h-5 w-5 text-amber-500" />
+                  <p className="text-xs text-amber-200 leading-relaxed">
+                    <strong>Connection Issue:</strong> The email confirmation link will likely fail on this device due to Supabase restrictions. <br/>
+                    <span className="block mt-1 text-amber-100 font-medium">Use "Explore Demo" below to skip login.</span>
+                  </p>
+               </div>
+            )}
+
             <button
               type="submit"
               disabled={loading}
@@ -112,7 +135,17 @@ export const Auth: React.FC = () => {
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-nest-800 text-center">
+          <div className="mt-4">
+             <button
+               onClick={onDemoLogin}
+               className="w-full bg-nest-900/50 hover:bg-nest-800 border border-nest-700 text-nest-300 hover:text-white font-semibold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 group"
+             >
+               <Compass size={18} className="text-primary-400 group-hover:rotate-45 transition-transform" />
+               Explore Demo (No Login)
+             </button>
+          </div>
+
+          <div className="mt-6 pt-6 border-t border-nest-800 text-center">
             <p className="text-sm text-nest-400">
               {mode === 'login' ? "Don't have an account? " : "Already have an account? "}
               <button 

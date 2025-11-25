@@ -2,7 +2,8 @@ import React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Session } from '@supabase/supabase-js';
 import { supabase } from '../supabaseClient';
-import { LogOut, Map, LayoutDashboard, Compass, User, Settings, Bell } from 'lucide-react';
+import { LogOut, Map, LayoutDashboard, Compass, User, Settings, Bell, ArrowLeft } from 'lucide-react';
+import { ChatAssistant } from './ChatAssistant';
 
 interface LayoutProps {
   session: Session;
@@ -18,6 +19,7 @@ export const Layout: React.FC<LayoutProps> = ({ session }) => {
   };
 
   const isActive = (path: string) => location.pathname === path;
+  const isDashboard = location.pathname === '/';
 
   return (
     <div className="flex h-screen bg-nest-950 overflow-hidden text-nest-50">
@@ -76,10 +78,16 @@ export const Layout: React.FC<LayoutProps> = ({ session }) => {
 
       {/* Mobile Header (Only visible on small screens) */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-nest-900 border-b border-nest-800 z-50 flex items-center justify-between px-4">
-         <div className="flex items-center gap-2">
-            <div className="h-8 w-8 bg-gradient-to-br from-primary-400 to-accent-500 rounded-lg flex items-center justify-center">
-               <Map size={16} className="text-white" />
-            </div>
+         <div className="flex items-center gap-3">
+            {!isDashboard ? (
+                <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-nest-400 hover:text-white transition-colors">
+                    <ArrowLeft size={20} />
+                </button>
+            ) : (
+                <div className="h-8 w-8 bg-gradient-to-br from-primary-400 to-accent-500 rounded-lg flex items-center justify-center">
+                   <Map size={16} className="text-white" />
+                </div>
+            )}
             <span className="font-bold text-lg">NEST</span>
          </div>
          <button onClick={handleLogout} className="p-2 text-nest-400 hover:text-white">
@@ -90,14 +98,29 @@ export const Layout: React.FC<LayoutProps> = ({ session }) => {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col relative overflow-hidden md:pl-0 pt-16 md:pt-0">
         {/* Top Header */}
-        <header className="hidden md:flex h-16 border-b border-nest-800/50 bg-nest-950/80 backdrop-blur-md items-center justify-end px-8 gap-4 sticky top-0 z-30">
-           <button className="p-2 text-nest-400 hover:text-primary-400 transition-colors relative">
-              <Bell size={20} />
-              <span className="absolute top-2 right-2 h-2 w-2 bg-accent-500 rounded-full border border-nest-950"></span>
-           </button>
-           <button className="p-2 text-nest-400 hover:text-primary-400 transition-colors">
-              <Settings size={20} />
-           </button>
+        <header className="hidden md:flex h-16 border-b border-nest-800/50 bg-nest-950/80 backdrop-blur-md items-center justify-between px-8 gap-4 sticky top-0 z-30">
+           {/* Left side of header - Contextual Back button for Desktop */}
+           <div>
+               {!isDashboard && (
+                   <button 
+                       onClick={() => navigate('/')} 
+                       className="flex items-center gap-2 text-nest-400 hover:text-white transition-colors text-sm font-medium py-1 px-2 rounded-lg hover:bg-nest-800"
+                   >
+                       <ArrowLeft size={16} /> Back to Dashboard
+                   </button>
+               )}
+           </div>
+
+           {/* Right side icons */}
+           <div className="flex items-center gap-2">
+               <button className="p-2 text-nest-400 hover:text-primary-400 transition-colors relative rounded-full hover:bg-nest-800/50">
+                  <Bell size={20} />
+                  <span className="absolute top-2 right-2 h-2 w-2 bg-accent-500 rounded-full border border-nest-950"></span>
+               </button>
+               <button className="p-2 text-nest-400 hover:text-primary-400 transition-colors rounded-full hover:bg-nest-800/50">
+                  <Settings size={20} />
+               </button>
+           </div>
         </header>
 
         <div className="flex-1 overflow-y-auto bg-nest-950 scroll-smooth">
@@ -106,6 +129,9 @@ export const Layout: React.FC<LayoutProps> = ({ session }) => {
           </div>
         </div>
       </main>
+
+      {/* Global AI Chat Assistant */}
+      <ChatAssistant />
     </div>
   );
 };

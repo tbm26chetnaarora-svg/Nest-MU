@@ -7,6 +7,7 @@ import { Dashboard } from './components/Dashboard';
 import { TripDetail } from './components/TripDetail';
 import { Layout } from './components/Layout';
 import { Loader2 } from 'lucide-react';
+import { DEMO_USER_ID } from './constants';
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -36,6 +37,26 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  const handleDemoLogin = () => {
+    // Create a fake session object for demo mode
+    const demoSession: any = {
+      access_token: 'demo-token',
+      token_type: 'bearer',
+      expires_in: 3600,
+      refresh_token: 'demo-refresh',
+      user: {
+        id: DEMO_USER_ID,
+        aud: 'authenticated',
+        role: 'authenticated',
+        email: 'demo@traveler.com',
+        app_metadata: { provider: 'email' },
+        user_metadata: {},
+        created_at: new Date().toISOString(),
+      }
+    };
+    setSession(demoSession);
+  };
+
   if (loading) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-nest-50">
@@ -48,7 +69,7 @@ export default function App() {
     <HashRouter>
       <Routes>
         {!session ? (
-          <Route path="*" element={<Auth />} />
+          <Route path="*" element={<Auth onDemoLogin={handleDemoLogin} />} />
         ) : (
           <Route element={<Layout session={session} />}>
             <Route path="/" element={<Dashboard session={session} />} />

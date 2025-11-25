@@ -1,3 +1,4 @@
+
 export interface Profile {
   id: string;
   email: string;
@@ -13,6 +14,7 @@ export interface Trip {
   start_date: string;
   end_date: string;
   cover_image: string;
+  video_url?: string; // New field for the Veo teaser
   status: 'planning' | 'confirmed' | 'completed';
   created_at: string;
 }
@@ -46,6 +48,7 @@ export interface Activity {
   notes?: string;
   is_booked: boolean;
   created_at: string;
+  assigned_to?: string[];
 }
 
 export interface DateRange {
